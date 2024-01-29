@@ -1,0 +1,16 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CacheSimulator",
+            "request": "launch",
+            "mainClass": "com.rainlandsociety.CacheSimulator",
+            "projectName": "cs4202p1",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
+        }
+    ]
+}
