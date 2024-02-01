@@ -1,9 +1,11 @@
 package com.rainlandsociety;
 
 public class MemoryOp {
-    public MemoryOp(String programHex, String memoryHex, char kind, String size) {
-        programCounterAddress = convertHexStringToLong(programHex);
-        memoryAddress = convertHexStringToLong(memoryHex);
+    public MemoryOp(String programHex, String memoryHex, char kind, int size) {
+        // programCounterAddress = convertHexStringToLong(programHex);
+        // memoryAddress = convertHexStringToLong(memoryHex);
+        programCounterAddress = programHex;
+        memoryAddress = memoryHex;
         switch (kind) {
             case 'R':
                 this.kind = Kind.R;
@@ -14,7 +16,8 @@ public class MemoryOp {
             default:
                 throw new IllegalArgumentException("Memory operation kind must be either R or W!");
         }
-        this.size = Byte.parseByte(size);
+        // this.size = Byte.parseByte(size);
+        this.size = size;
     }
 
     enum Kind {
@@ -22,12 +25,17 @@ public class MemoryOp {
         W
     }
 
-    long programCounterAddress;
-    long memoryAddress;
+    String programCounterAddress;
+    public String memoryAddress;
     Kind kind;
-    byte size;
+    public int size;
 
-    private long convertHexStringToLong(String hexString) {
-        return Long.parseUnsignedLong(hexString);
-    }
+    // long programCounterAddress;
+    // long memoryAddress;
+    // Kind kind;
+    // byte size;
+
+    // private long convertHexStringToLong(String hexString) {
+    //     return Long.parseUnsignedLong(hexString);
+    // }
 }

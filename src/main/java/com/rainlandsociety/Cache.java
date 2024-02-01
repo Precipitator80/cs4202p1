@@ -41,33 +41,24 @@ public class Cache {
     @JSONField(name = "misses")
     public int misses;
 
-    /*
     void setup() {
         int numberOfLines = size / lineSize;
-    
-        lines = new ArrayList<>();
-        for (int i = 0; i < numberOfLines; i++) {
-            //lines.add();
-        }
-    
-        indexSize = (int) log2(numberOfLines);
-        offsetSize = (int) log2(lineSize);
-        tagSize = 64 - indexSize - offsetSize;
+
+        lines = new String[numberOfLines][lineSize];
+
+        int indexSize = (int) log2(numberOfLines);
+        int offsetSize = (int) log2(lineSize);
+        int tagSize = 64 - indexSize - offsetSize;
+
+        addressParser = new AddressParser(indexSize, offsetSize, tagSize);
     }
-    
+
     double log2(int input) {
         return Math.log(input) / Math.log(2);
     }
-    
-    int tag(String address) {
-        return 0;
-    }
-    
-    private List<Byte> lines;
-    private int indexSize;
-    private int offsetSize;
-    private int tagSize;
-    */
+
+    private String[][] lines;
+    private AddressParser addressParser;
 
     /*
     First 10 lines of bwaves.
