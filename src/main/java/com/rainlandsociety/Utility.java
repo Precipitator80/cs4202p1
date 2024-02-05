@@ -3,13 +3,14 @@ package com.rainlandsociety;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.annotation.JSONField;
 
-public class JsonHandler {
+public class Utility {
     public class CacheConfiguration {
         @JSONField(name = "caches")
         List<Cache> caches;
@@ -30,7 +31,7 @@ public class JsonHandler {
             CacheConfiguration cacheConfiguration = JSON.parseObject(jsonString, CacheConfiguration.class);
             List<Cache> caches = cacheConfiguration.getCaches();
             for (Cache cache : caches) {
-                cache.setup();
+                cache.initialise();
             }
             return caches;
         }
@@ -89,5 +90,37 @@ public class JsonHandler {
     public static void printResults(CacheSimulator simulator) {
         String jsonObject = JSON.toJSONString(simulator);
         System.out.println(jsonObject);
+    }
+
+    public static double log2(int input) {
+        return Math.log(input) / Math.log(2);
+    }
+
+    public static int parseBinaryString(String binaryString) {
+        return Integer.parseInt(binaryString, 2);
+    }
+
+    /**
+     * Convert hex string to binary string -
+     * CapnChaos -
+     * https://stackoverflow.com/questions/8640803/convert-hex-string-to-binary-string -
+     * Accessed 05.02.2024
+     * @param hex The string in hexadecimal digits.
+     * @return The string in binary digits.
+     */
+    public static String hexToBinary(String hex) {
+        int len = hex.length() * 4;
+        String bin = new BigInteger(hex, 16).toString(2);
+
+        //left pad the string result with 0s if converting to BigInteger removes them.
+        if (bin.length() < len) {
+            int diff = len - bin.length();
+            String pad = "";
+            for (int i = 0; i < diff; ++i) {
+                pad = pad.concat("0");
+            }
+            bin = pad.concat(bin);
+        }
+        return bin;
     }
 }

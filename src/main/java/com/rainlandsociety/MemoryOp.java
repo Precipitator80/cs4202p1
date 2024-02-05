@@ -4,8 +4,8 @@ public class MemoryOp {
     public MemoryOp(String programHex, String memoryHex, char kind, int size) {
         // programCounterAddress = convertHexStringToLong(programHex);
         // memoryAddress = convertHexStringToLong(memoryHex);
-        programCounterAddress = programHex;
-        memoryAddress = memoryHex;
+        programCounterAddress = new BinaryAddress(programHex);
+        memoryAddress = new BinaryAddress(memoryHex);
         switch (kind) {
             case 'R':
                 this.kind = Kind.R;
@@ -25,8 +25,8 @@ public class MemoryOp {
         W
     }
 
-    String programCounterAddress;
-    public String memoryAddress;
+    BinaryAddress programCounterAddress;
+    BinaryAddress memoryAddress;
     Kind kind;
     public int size;
 

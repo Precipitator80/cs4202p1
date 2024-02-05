@@ -1,8 +1,5 @@
 package com.rainlandsociety;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fastjson2.annotation.JSONField;
 
 public class Cache {
@@ -20,6 +17,9 @@ public class Cache {
     //     LFU
     // }
 
+    /**
+     * JSON Fields
+     */
     @JSONField(name = "name")
     public String name;
 
@@ -35,30 +35,49 @@ public class Cache {
     @JSONField(name = "replacement_policy", serialize = false)
     public String replacementPolicy;
 
-    @JSONField(name = "hits")
+    @JSONField(name = "hits", deserialize = false)
     public int hits;
 
-    @JSONField(name = "misses")
+    @JSONField(name = "misses", deserialize = false)
     public int misses;
 
-    void setup() {
+    /**
+     * Other variables.
+     */
+    private final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
+    private String[][] lines; // The cache lines holding data.
+
+    @JSONField(serialize = false, deserialize = false)
+    private int indexSize; // The index size of the cache.
+    @JSONField(serialize = false, deserialize = false)
+    private int offsetSize; // The offset size of the cache.
+    @JSONField(serialize = false, deserialize = false)
+    private int tagSize; // The tag size of the cache.
+
+    void initialise() {
         int numberOfLines = size / lineSize;
 
         lines = new String[numberOfLines][lineSize];
 
-        int indexSize = (int) log2(numberOfLines);
-        int offsetSize = (int) log2(lineSize);
-        int tagSize = 64 - indexSize - offsetSize;
-
-        addressParser = new AddressParser(indexSize, offsetSize, tagSize);
+        indexSize = (int) Utility.log2(numberOfLines);
+        offsetSize = (int) Utility.log2(lineSize);
+        tagSize = ADDRESS_SPACE_SIZE - indexSize - offsetSize;
     }
 
-    double log2(int input) {
-        return Math.log(input) / Math.log(2);
+    /**
+     * Getters
+     */
+    public int getIndexSize() {
+        return indexSize;
     }
 
-    private String[][] lines;
-    private AddressParser addressParser;
+    public int getOffsetSize() {
+        return offsetSize;
+    }
+
+    public int getTagSize() {
+        return tagSize;
+    }
 
     /*
     First 10 lines of bwaves.

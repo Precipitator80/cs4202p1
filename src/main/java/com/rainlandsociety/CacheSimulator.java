@@ -15,11 +15,12 @@ public class CacheSimulator {
 
         CacheSimulator simulator = new CacheSimulator();
         try {
-            simulator.caches = JsonHandler.readConfiguration(args[0]);
+            simulator.caches = Utility.readConfiguration(args[0]);
 
-            simulator.simulateProgram(JsonHandler.readProgramTrace(args[1]));
+            // Use just a few lines instead first to test more quickly.
+            //simulator.simulateProgram(Utility.readProgramTrace(args[1]));
 
-            JsonHandler.printResults(simulator);
+            Utility.printResults(simulator);
         } catch (IOException e) {
             System.err.println("Could not read cache information from file:\n" + e.getMessage());
         }
