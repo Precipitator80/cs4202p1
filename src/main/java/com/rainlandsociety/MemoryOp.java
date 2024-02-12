@@ -2,10 +2,10 @@ package com.rainlandsociety;
 
 public class MemoryOp {
     public MemoryOp(String programHex, String memoryHex, char kind, int size) {
+        this(memoryHex, size);
         // programCounterAddress = convertHexStringToLong(programHex);
         // memoryAddress = convertHexStringToLong(memoryHex);
-        programCounterAddress = new BinaryAddress(programHex);
-        memoryAddress = new BinaryAddress(memoryHex);
+        programCounterAddress = new BinaryAddress(Utility.hexToBinary(programHex));
         switch (kind) {
             case 'R':
                 this.kind = Kind.R;
@@ -16,7 +16,10 @@ public class MemoryOp {
             default:
                 throw new IllegalArgumentException("Memory operation kind must be either R or W!");
         }
-        // this.size = Byte.parseByte(size);
+    }
+
+    public MemoryOp(String memoryHex, int size) {
+        memoryAddress = new BinaryAddress(Utility.hexToBinary(memoryHex));
         this.size = size;
     }
 

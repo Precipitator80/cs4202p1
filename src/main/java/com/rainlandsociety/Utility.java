@@ -27,7 +27,7 @@ public class Utility {
     public static List<Cache> readConfiguration(String fileName) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String jsonString = reader.lines().collect(Collectors.joining(System.lineSeparator()));
-            System.out.println(jsonString);
+            System.err.println(jsonString);
             CacheConfiguration cacheConfiguration = JSON.parseObject(jsonString, CacheConfiguration.class);
             List<Cache> caches = cacheConfiguration.getCaches();
             for (Cache cache : caches) {
@@ -42,11 +42,12 @@ public class Utility {
             return reader.lines()
                     .map(line -> {
                         String[] tokens = line.split("\\s+");
-                        String programHex = tokens[0];
+                        //String programHex = tokens[0];
                         String memoryHex = tokens[1];
-                        char kind = tokens[2].charAt(0);
+                        //char kind = tokens[2].charAt(0);
                         int size = Integer.parseInt(tokens[3]);
-                        return new MemoryOp(programHex, memoryHex, kind, size);
+                        //return new MemoryOp(programHex, memoryHex, kind, size);
+                        return new MemoryOp(memoryHex, size);
                     })
                     .collect(Collectors.toList());
         }
@@ -96,8 +97,28 @@ public class Utility {
         return Math.log(input) / Math.log(2);
     }
 
-    public static int parseBinaryString(String binaryString) {
-        return Integer.parseInt(binaryString, 2);
+    public static long parseBinaryString(String binaryString) {
+        return Long.parseLong(binaryString, 2);
+    }
+
+    public static String addOneToBinary(String binaryString, int index) {
+        // Convert binary string to char array for easy manipulation
+        char[] binaryArray = binaryString.toCharArray();
+
+        // Start from the rightmost bit (least significant bit)
+        for (int i = index; i >= 0; i--) {
+            if (binaryArray[i] == '0') {
+                // If the bit is '0', change it to '1' and exit the loop
+                binaryArray[i] = '1';
+                break;
+            } else {
+                // If the bit is '1', change it to '0' and continue carrying over
+                binaryArray[i] = '0';
+            }
+        }
+
+        // Convert the modified char array back to a string
+        return String.valueOf(binaryArray);
     }
 
     /**
@@ -113,6 +134,12 @@ public class Utility {
         String bin = new BigInteger(hex, 16).toString(2);
 
         //left pad the string result with 0s if converting to BigInteger removes them.
+        bin = padBinaryString(bin, len);
+
+        return bin;
+    }
+
+    public static String padBinaryString(String bin, int len) {
         if (bin.length() < len) {
             int diff = len - bin.length();
             String pad = "";

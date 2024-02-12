@@ -41,11 +41,17 @@ public class Cache {
     @JSONField(name = "misses", deserialize = false)
     public int misses;
 
+    @JSONField(name = "accesses", serialize = false, deserialize = false)
+    public int accesses;
+
+    @JSONField(name = "block_overruns", serialize = false, deserialize = false)
+    public int blockOverruns;
+
     /**
      * Other variables.
      */
     private final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
-    private String[][] lines; // The cache lines holding data.
+    private CacheLine[] lines; // The cache lines holding data.
 
     @JSONField(serialize = false, deserialize = false)
     private int indexSize; // The index size of the cache.
@@ -55,9 +61,12 @@ public class Cache {
     private int tagSize; // The tag size of the cache.
 
     void initialise() {
-        int numberOfLines = size / lineSize;
+        int numberOfLines = size / lineSize; // DIRECT CACHE
 
-        lines = new String[numberOfLines][lineSize];
+        lines = new CacheLine[numberOfLines];
+        for (int i = 0; i < numberOfLines; i++) {
+            lines[i] = new CacheLine();
+        }
 
         indexSize = (int) Utility.log2(numberOfLines);
         offsetSize = (int) Utility.log2(lineSize);
@@ -67,6 +76,10 @@ public class Cache {
     /**
      * Getters
      */
+    public CacheLine getLine(int index) {
+        return lines[index];
+    }
+
     public int getIndexSize() {
         return indexSize;
     }

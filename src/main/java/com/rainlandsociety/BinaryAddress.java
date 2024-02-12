@@ -6,14 +6,19 @@ package com.rainlandsociety;
      * Hex String → Binary String → Index, Offset and Tag.
  */
 public class BinaryAddress {
-    public BinaryAddress(String hexString) {
-        this.binaryString = Utility.hexToBinary(hexString);
+    public BinaryAddress(String binaryString) {
+        this.binaryString = binaryString;
     }
 
     String binaryString;
 
+    public BinaryAddress nextBlock(Cache cache) {
+        return new BinaryAddress(Utility.addOneToBinary(binaryString, cache.getTagSize() + cache.getIndexSize() - 1));
+    }
+
     /**
      * An address parser that parses indices, offsets and tags of an address given their size within the address.
+     * TODO ARE THESE DATA TYPES OK (INT)?
      */
 
     /**
@@ -22,7 +27,7 @@ public class BinaryAddress {
      * @param cache The cache to translate to.
      * @return The tag of the address for the given cache.
      */
-    public int getTag(Cache cache) {
+    public long getTag(Cache cache) {
         return Utility.parseBinaryString(binaryString.substring(0, cache.getTagSize()));
     }
 
@@ -35,7 +40,7 @@ public class BinaryAddress {
     public int getIndex(Cache cache) {
         int startIndex = cache.getTagSize();
         int endIndex = startIndex + cache.getIndexSize();
-        return Utility.parseBinaryString(binaryString.substring(startIndex, endIndex));
+        return (int) Utility.parseBinaryString(binaryString.substring(startIndex, endIndex));
     }
 
     /**
@@ -44,7 +49,7 @@ public class BinaryAddress {
      * @param cache The cache to translate to.
      * @return The offset of the address.
      */
-    public int getOffset(Cache cache) {
+    public long getOffset(Cache cache) {
         int startIndex = cache.getTagSize() + cache.getIndexSize();
         int endIndex = startIndex + cache.getOffsetSize();
         return Utility.parseBinaryString(binaryString.substring(startIndex, endIndex));
