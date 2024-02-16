@@ -6,11 +6,11 @@ import java.util.LinkedList;
 import com.alibaba.fastjson2.annotation.JSONField;
 
 public class Cache {
-    // enum ReplacementPolicy {
-    //     RR,
-    //     LRU,
-    //     LFU
-    // }
+    enum ReplacementPolicy {
+        RR,
+        LRU,
+        LFU
+    }
 
     /**
      * JSON Fields
@@ -28,7 +28,7 @@ public class Cache {
     public String kind;
 
     @JSONField(name = "replacement_policy", serialize = false)
-    public String replacementPolicy;
+    public String replacementPolicyString;
 
     @JSONField(name = "hits", deserialize = false)
     public int hits;
@@ -50,6 +50,7 @@ public class Cache {
      */
     private final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
     private LinkedList<CacheLine>[] sets; // Sets of cache lines holding data.
+    private ReplacementPolicy replacementPolicy;
 
     @JSONField(serialize = false, deserialize = false)
     private int setIdentSize; // The index size of the cache.
@@ -83,13 +84,25 @@ public class Cache {
         }
         setSize = numberOfLines / numberOfSets;
 
-        // Initialise the cache lines.
+        // Initialise sets of cache lines.
         sets = new LinkedList[numberOfSets];
         for (int i = 0; i < numberOfSets; i++) {
             sets[i] = new LinkedList<>();
             for (int j = 0; j < setSize; j++) {
                 sets[i].add(new CacheLine());
             }
+        }
+
+        // Set the replacement policy.
+        switch (replacementPolicyString) {
+            case ("lru"):
+                replacementPolicy = ReplacementPolicy.LRU;
+                break;
+            case ("lfu"):
+                replacementPolicy = ReplacementPolicy.LFU;
+                break;
+            default:
+                replacementPolicy = ReplacementPolicy.RR;
         }
 
         setIdentSize = (int) Utility.log2(numberOfSets);
@@ -108,19 +121,57 @@ public class Cache {
                 // Compulsory miss!
                 misses++;
                 line.updateTag(tag);
+                // Move back to the fron of the list for LRU and RR.
+                switch (replacementPolicy) {
+                    case LFU:
+                        // TODO LFU INITIAL PLACEMENT
+                    default:
+                        if (line != set.peek()) {
+                            setIterator.remove();
+                            set.addFirst(line);
+                        }
+                }
                 return false;
             } else if (line.getTag() == tag) {
                 // Hit!
                 hits++;
+
+                // Refresh
+                switch (replacementPolicy) {
+                    case LRU:
+                        if (line != set.peek()) {
+                            setIterator.remove();
+                            set.addFirst(line);
+                        }
+                        break;
+                    case LFU:
+                        // TODO LFU REFRESH
+                    default: // Nothing to do for RR.
+                }
                 return true;
             }
         }
         // Capacity / conflict miss! Evict and replace.
-        // TODO
-        // For now just choose first line (direct)
         misses++;
-        set.peek().updateTag(tag);
+        replace(set, tag);
         return false;
+    }
+
+    void replace(LinkedList<CacheLine> set, long newTag) {
+        switch (replacementPolicy) {
+            case LRU:
+                CacheLine leastRecentlyUsed = set.removeLast();
+                leastRecentlyUsed.updateTag(newTag);
+                set.addFirst(leastRecentlyUsed);
+                break;
+            case LFU:
+                // TODO LFU REPLACEMENT
+                break;
+            default: // RR
+                CacheLine last = set.removeLast();
+                last.updateTag(newTag);
+                set.addFirst(last);
+        }
     }
 
     /**
