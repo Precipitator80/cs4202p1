@@ -1,5 +1,8 @@
 package com.rainlandsociety;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import com.alibaba.fastjson2.annotation.JSONField;
 
 public class Cache {
@@ -39,13 +42,14 @@ public class Cache {
     @JSONField(name = "block_overruns", serialize = false, deserialize = false)
     public int blockOverruns;
 
+    @JSONField(name = "block_overruns", serialize = false, deserialize = false)
     public int setSize;
 
     /**
      * Other variables.
      */
     private final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
-    private CacheLine[] lines; // The cache lines holding data.
+    private LinkedList<CacheLine>[] sets; // Sets of cache lines holding data.
 
     @JSONField(serialize = false, deserialize = false)
     private int setIdentSize; // The index size of the cache.
@@ -55,14 +59,8 @@ public class Cache {
     private int tagSize; // The tag size of the cache.
 
     void initialise() throws Exception {
-        // Initialise the cache lines.
-        int numberOfLines = size / lineSize;
-        lines = new CacheLine[numberOfLines];
-        for (int i = 0; i < numberOfLines; i++) {
-            lines[i] = new CacheLine();
-        }
-
         // Define the sets.
+        int numberOfLines = size / lineSize;
         int numberOfSets;
         switch (kind) {
             case ("direct"):
@@ -85,17 +83,27 @@ public class Cache {
         }
         setSize = numberOfLines / numberOfSets;
 
+        // Initialise the cache lines.
+        sets = new LinkedList[numberOfSets];
+        for (int i = 0; i < numberOfSets; i++) {
+            sets[i] = new LinkedList<>();
+            for (int j = 0; j < setSize; j++) {
+                sets[i].add(new CacheLine());
+            }
+        }
+
         setIdentSize = (int) Utility.log2(numberOfSets);
         offsetIdentSize = (int) Utility.log2(lineSize);
         tagSize = ADDRESS_SPACE_SIZE - setIdentSize - offsetIdentSize;
     }
 
     public boolean performOperation(BinaryAddress memoryAddress) {
-        int set = memoryAddress.getSet(this);
+        int setNumber = memoryAddress.getSet(this);
         long tag = memoryAddress.getTag(this);
-        int startNumber = set * setSize;
-        for (int lineNumber = startNumber; lineNumber < startNumber + setSize; lineNumber++) {
-            CacheLine line = lines[lineNumber];
+        LinkedList<CacheLine> set = sets[setNumber];
+        Iterator<CacheLine> setIterator = set.iterator();
+        while (setIterator.hasNext()) {
+            CacheLine line = setIterator.next();
             if (!line.getValid()) {
                 // Compulsory miss!
                 misses++;
@@ -111,7 +119,7 @@ public class Cache {
         // TODO
         // For now just choose first line (direct)
         misses++;
-        lines[startNumber].updateTag(tag);
+        set.peek().updateTag(tag);
         return false;
     }
 
