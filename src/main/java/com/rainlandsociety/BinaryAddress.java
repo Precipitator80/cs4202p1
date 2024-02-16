@@ -13,7 +13,8 @@ public class BinaryAddress {
     String binaryString;
 
     public BinaryAddress nextBlock(Cache cache) {
-        return new BinaryAddress(Utility.addOneToBinary(binaryString, cache.getTagSize() + cache.getIndexSize() - 1));
+        return new BinaryAddress(
+                Utility.addOneToBinary(binaryString, cache.getTagSize() + cache.getSetIdentSize() - 1));
     }
 
     /**
@@ -37,9 +38,12 @@ public class BinaryAddress {
      * @param cache The cache to translate to.
      * @return The index of the address.
      */
-    public int getIndex(Cache cache) {
+    public int getSet(Cache cache) {
+        if (cache.getSetIdentSize() == 0) {
+            return 0;
+        }
         int startIndex = cache.getTagSize();
-        int endIndex = startIndex + cache.getIndexSize();
+        int endIndex = startIndex + cache.getSetIdentSize();
         return (int) Utility.parseBinaryString(binaryString.substring(startIndex, endIndex));
     }
 
@@ -50,8 +54,8 @@ public class BinaryAddress {
      * @return The offset of the address.
      */
     public long getOffset(Cache cache) {
-        int startIndex = cache.getTagSize() + cache.getIndexSize();
-        int endIndex = startIndex + cache.getOffsetSize();
+        int startIndex = cache.getTagSize() + cache.getSetIdentSize();
+        int endIndex = startIndex + cache.getOffsetIdentSize();
         return Utility.parseBinaryString(binaryString.substring(startIndex, endIndex));
     }
 }

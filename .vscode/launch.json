@@ -27,6 +27,14 @@
             "mainClass": "com.rainlandsociety.CacheSimulator",
             "projectName": "cs4202p1",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
+        },
+        {
+            "type": "java",
+            "name": "full_rr leela",
+            "request": "launch",
+            "mainClass": "com.rainlandsociety.CacheSimulator",
+            "projectName": "cs4202p1",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_rr.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         }
     ]
 }

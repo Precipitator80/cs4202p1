@@ -24,7 +24,7 @@ public class Utility {
         }
     }
 
-    public static List<Cache> readConfiguration(String fileName) throws IOException {
+    public static List<Cache> readConfiguration(String fileName) throws Exception {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String jsonString = reader.lines().collect(Collectors.joining(System.lineSeparator()));
             System.err.println(jsonString);

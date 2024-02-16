@@ -42,6 +42,8 @@ public class CacheSimulator {
             Utility.printResults(simulator);
         } catch (IOException e) {
             System.err.println("Could not read cache information from file:\n" + e.getMessage());
+        } catch (Exception e) {
+            System.err.println(e.toString());
         }
     }
 
@@ -95,35 +97,26 @@ public class CacheSimulator {
      */
     void simulateMemoryOp(BinaryAddress memoryAddress, int size, int cacheIndex) {
         Cache cache = caches.get(cacheIndex);
-        int index = memoryAddress.getIndex(cache);
-        long tag = memoryAddress.getTag(cache);
-        CacheLine cacheLine = cache.getLine(index);
-        boolean hit = cacheLine.updateTag(cache, tag); // CHECK SIZE HERE
+        boolean hit = cache.performOperation(memoryAddress);
         cache.accesses++;
-        if (hit) {
-            cache.hits++;
-            if (!fitsInLine(memoryAddress, size, cache)) {
+        if (hit && !fitsInLine(memoryAddress, size, cache)) {
+            cache.blockOverruns++;
+            if (cacheIndex > 0) {
+                cache.hits--;
+            }
+            BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
+            simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
+        } else if (cacheIndex < caches.size() - 1) {
+            if (fitsInLine(memoryAddress, size, cache)) {
+                simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
+            } else {
                 cache.blockOverruns++;
                 if (cacheIndex > 0) {
                     cache.hits--;
                 }
+                simulateMemoryOp(memoryAddress, cache.lineSize, cacheIndex + 1);
                 BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
                 simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
-            }
-        } else {
-            cache.misses++;
-            if (cacheIndex < caches.size() - 1) {
-                if (fitsInLine(memoryAddress, size, cache)) {
-                    simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
-                } else {
-                    cache.blockOverruns++;
-                    if (cacheIndex > 0) {
-                        cache.hits--;
-                    }
-                    simulateMemoryOp(memoryAddress, cache.lineSize, cacheIndex + 1);
-                    BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
-                    simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
-                }
             }
         }
 

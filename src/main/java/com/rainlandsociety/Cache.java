@@ -3,14 +3,6 @@ package com.rainlandsociety;
 import com.alibaba.fastjson2.annotation.JSONField;
 
 public class Cache {
-    // enum Kind {
-    //     DIRECT,
-    //     FULL,
-    //     TWO_WAY,
-    //     FOUR_WAY,
-    //     EIGHT_WAY
-    // }
-
     // enum ReplacementPolicy {
     //     RR,
     //     LRU,
@@ -47,6 +39,8 @@ public class Cache {
     @JSONField(name = "block_overruns", serialize = false, deserialize = false)
     public int blockOverruns;
 
+    public int setSize;
+
     /**
      * Other variables.
      */
@@ -54,38 +48,82 @@ public class Cache {
     private CacheLine[] lines; // The cache lines holding data.
 
     @JSONField(serialize = false, deserialize = false)
-    private int indexSize; // The index size of the cache.
+    private int setIdentSize; // The index size of the cache.
     @JSONField(serialize = false, deserialize = false)
-    private int offsetSize; // The offset size of the cache.
+    private int offsetIdentSize; // The offset size of the cache.
     @JSONField(serialize = false, deserialize = false)
     private int tagSize; // The tag size of the cache.
 
-    void initialise() {
-        int numberOfLines = size / lineSize; // DIRECT CACHE
-
+    void initialise() throws Exception {
+        // Initialise the cache lines.
+        int numberOfLines = size / lineSize;
         lines = new CacheLine[numberOfLines];
         for (int i = 0; i < numberOfLines; i++) {
             lines[i] = new CacheLine();
         }
 
-        indexSize = (int) Utility.log2(numberOfLines);
-        offsetSize = (int) Utility.log2(lineSize);
-        tagSize = ADDRESS_SPACE_SIZE - indexSize - offsetSize;
+        // Define the sets.
+        int numberOfSets;
+        switch (kind) {
+            case ("direct"):
+                numberOfSets = numberOfLines;
+                break;
+            case ("full"):
+                numberOfSets = 1;
+                break;
+            case ("2way"):
+                numberOfSets = numberOfLines / 2;
+                break;
+            case ("4way"):
+                numberOfSets = numberOfLines / 4;
+                break;
+            case ("8way"):
+                numberOfSets = numberOfLines / 8;
+                break;
+            default:
+                throw new Exception("The cache type '" + kind + "' is not supported by the simulator!");
+        }
+        setSize = numberOfLines / numberOfSets;
+
+        setIdentSize = (int) Utility.log2(numberOfSets);
+        offsetIdentSize = (int) Utility.log2(lineSize);
+        tagSize = ADDRESS_SPACE_SIZE - setIdentSize - offsetIdentSize;
+    }
+
+    public boolean performOperation(BinaryAddress memoryAddress) {
+        int set = memoryAddress.getSet(this);
+        long tag = memoryAddress.getTag(this);
+        int startNumber = set * setSize;
+        for (int lineNumber = startNumber; lineNumber < startNumber + setSize; lineNumber++) {
+            CacheLine line = lines[lineNumber];
+            if (!line.getValid()) {
+                // Compulsory miss!
+                misses++;
+                line.updateTag(tag);
+                return false;
+            } else if (line.getTag() == tag) {
+                // Hit!
+                hits++;
+                return true;
+            }
+        }
+        // Capacity / conflict miss! Evict and replace.
+        // TODO
+        // For now just choose first line (direct)
+        misses++;
+        lines[startNumber].updateTag(tag);
+        return false;
     }
 
     /**
      * Getters
      */
-    public CacheLine getLine(int index) {
-        return lines[index];
+    public int getSetIdentSize() {
+        return setIdentSize;
     }
 
-    public int getIndexSize() {
-        return indexSize;
-    }
-
-    public int getOffsetSize() {
-        return offsetSize;
+    public int getOffsetIdentSize() {
+        return offsetIdentSize;
     }
 
     public int getTagSize() {
