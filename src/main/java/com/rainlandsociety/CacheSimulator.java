@@ -106,7 +106,7 @@ public class CacheSimulator {
             }
             BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
             simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
-        } else if (cacheIndex < caches.size() - 1) {
+        } else if (!hit && cacheIndex < caches.size() - 1) {
             if (fitsInLine(memoryAddress, size, cache)) {
                 simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
             } else {
