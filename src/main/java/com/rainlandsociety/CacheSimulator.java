@@ -106,32 +106,24 @@ public class CacheSimulator {
             }
             BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
             simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
-        } else if (!hit && cacheIndex < caches.size() - 1) {
-            if (fitsInLine(memoryAddress, size, cache)) {
-                simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
-            } else {
-                cache.blockOverruns++;
-                if (cacheIndex > 0) {
-                    cache.hits--;
+        } else if (!hit) {
+            if (cacheIndex < caches.size() - 1) {
+                if (fitsInLine(memoryAddress, size, cache)) {
+                    simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
+                } else {
+                    cache.blockOverruns++;
+                    if (cacheIndex > 0) {
+                        cache.hits--;
+                    }
+                    simulateMemoryOp(memoryAddress, cache.lineSize, cacheIndex + 1);
+                    BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
+                    simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
                 }
-                simulateMemoryOp(memoryAddress, cache.lineSize, cacheIndex + 1);
+            } else if (!fitsInLine(memoryAddress, size, cache)) {
                 BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
                 simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
             }
         }
-
-        // if (hit && !fitsInLine(memoryAddress, size, cache)) {
-        //     BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
-        //     simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
-        // } else if (!hit && cacheIndex < caches.size() - 1) {
-        //     if (fitsInLine(memoryAddress, size, cache)) {
-        //         simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
-        //     } else {
-        //         simulateMemoryOp(memoryAddress, cache.lineSize, cacheIndex + 1);
-        //         BinaryAddress nextBlock = memoryAddress.nextBlock(cache);
-        //         simulateMemoryOp(nextBlock, size - cache.lineSize, cacheIndex);
-        //     }
-        // }
     }
 
     boolean fitsInLine(BinaryAddress memoryAddress, int size, Cache cache) {
