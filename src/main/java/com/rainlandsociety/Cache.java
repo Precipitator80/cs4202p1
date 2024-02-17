@@ -121,10 +121,11 @@ public class Cache {
                 // Compulsory miss!
                 misses++;
                 line.updateTag(tag);
-                // Move back to the fron of the list for LRU and RR.
+                // Move back to the front of the list for LRU and RR.
                 switch (replacementPolicy) {
                     case LFU:
-                        // TODO LFU INITIAL PLACEMENT
+                        line.resetFrequency();
+                        break;
                     default:
                         if (line != set.peek()) {
                             setIterator.remove();
@@ -145,7 +146,9 @@ public class Cache {
                         }
                         break;
                     case LFU:
-                        // TODO LFU REFRESH
+                        // Refresh frequency
+                        line.incrementFrequency();
+                        break;
                     default: // Nothing to do for RR.
                 }
                 return true;
@@ -165,7 +168,15 @@ public class Cache {
                 set.addFirst(leastRecentlyUsed);
                 break;
             case LFU:
-                // TODO LFU REPLACEMENT
+                // Evict least frequently used cache line
+                CacheLine leastFrequentlyUsed = set.getFirst();
+                for (CacheLine line : set) {
+                    if (line.getFrequency() < leastFrequentlyUsed.getFrequency()) {
+                        leastFrequentlyUsed = line;
+                    }
+                }
+                leastFrequentlyUsed.updateTag(newTag);
+                leastFrequentlyUsed.resetFrequency();
                 break;
             default: // RR
                 CacheLine last = set.removeLast();

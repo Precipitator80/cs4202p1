@@ -3,6 +3,7 @@ package com.rainlandsociety;
 public class CacheLine {
     private long tag;
     private boolean valid;
+    private int frequency;
 
     public void updateTag(long tag) {
         this.tag = tag;
@@ -15,5 +16,17 @@ public class CacheLine {
 
     public boolean getValid() {
         return valid;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public void incrementFrequency() {
+        frequency++;
+    }
+
+    public void resetFrequency() {
+        frequency = 1;
     }
 }
