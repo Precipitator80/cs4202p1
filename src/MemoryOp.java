@@ -1,5 +1,3 @@
-package com.rainlandsociety;
-
 public class MemoryOp {
     public MemoryOp(String programHex, String memoryHex, char kind, int size) {
         this(memoryHex, size);

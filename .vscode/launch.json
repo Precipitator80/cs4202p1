@@ -8,55 +8,57 @@
             "type": "java",
             "name": "direct bwaves",
             "request": "launch",
-            "mainClass": "com.rainlandsociety.CacheSimulator",
-            "projectName": "cs4202p1",
-            // "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
-            "args": "../cs4202p1resources/sample-inputs/direct.json ../cs4202p1resources/trace-files/bwaves.out"
+            "mainClass": "CacheSimulator",
+            "projectName": "Practical 1_6bd3f609",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
+        },
+        {
+            "type": "java",
+            "name": "direct bwaves2",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "Practical 1_6bd3f609",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
         },
         {
             "type": "java",
             "name": "l1l2l3direct bwaves",
             "request": "launch",
-            "mainClass": "com.rainlandsociety.CacheSimulator",
-            "projectName": "cs4202p1",
-            // "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
-            "args": "../cs4202p1resources/sample-inputs/l1l2l3direct.json ../cs4202p1resources/trace-files/bwaves.out"
+            "mainClass": "CacheSimulator",
+            "projectName": "Practical 1_6bd3f609",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
         },
         {
             "type": "java",
             "name": "l1l2l3direct leela",
             "request": "launch",
-            "mainClass": "com.rainlandsociety.CacheSimulator",
-            "projectName": "cs4202p1",
-            // "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
-            "args": "../cs4202p1resources/sample-inputs/l1l2l3direct.json ../cs4202p1resources/trace-files/leela.out"
+            "mainClass": "CacheSimulator",
+            "projectName": "Practical 1_6bd3f609",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         },
         {
             "type": "java",
             "name": "full_rr leela",
             "request": "launch",
-            "mainClass": "com.rainlandsociety.CacheSimulator",
-            "projectName": "cs4202p1",
-            // "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_rr.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
-            "args": "../cs4202p1resources/sample-inputs/full_rr.json ../cs4202p1resources/trace-files/leela.out"
+            "mainClass": "CacheSimulator",
+            "projectName": "Practical 1_6bd3f609",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_rr.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         },
         {
             "type": "java",
             "name": "full_lru leela",
             "request": "launch",
-            "mainClass": "com.rainlandsociety.CacheSimulator",
-            "projectName": "cs4202p1",
-            // "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_rr.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
-            "args": "../cs4202p1resources/sample-inputs/full_lru.json ../cs4202p1resources/trace-files/leela.out"
+            "mainClass": "CacheSimulator",
+            "projectName": "Practical 1_6bd3f609",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_lru.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         },
         {
             "type": "java",
             "name": "full_lfu leela",
             "request": "launch",
-            "mainClass": "com.rainlandsociety.CacheSimulator",
-            "projectName": "cs4202p1",
-            // "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_rr.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
-            "args": "../cs4202p1resources/sample-inputs/full_lfu.json ../cs4202p1resources/trace-files/leela.out"
+            "mainClass": "CacheSimulator",
+            "projectName": "Practical 1_6bd3f609",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_lfu.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         }
     ]
 }

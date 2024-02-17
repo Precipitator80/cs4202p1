@@ -1,5 +1,3 @@
-package com.rainlandsociety;
-
 public class CacheLine {
     private long tag;
     private boolean valid;

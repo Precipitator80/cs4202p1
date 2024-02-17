@@ -1,5 +1,3 @@
-package com.rainlandsociety;
-
 /**
  * Use to convert hex string to binary string, which is then later converted to a cache-specific address.
      * Parsing required:

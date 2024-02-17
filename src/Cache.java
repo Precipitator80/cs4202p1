@@ -1,5 +1,3 @@
-package com.rainlandsociety;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -28,7 +26,7 @@ public class Cache {
     public String kind;
 
     @JSONField(name = "replacement_policy", serialize = false)
-    public String replacementPolicyString;
+    public String replacementPolicyString = "";
 
     @JSONField(name = "hits", deserialize = false)
     public int hits;

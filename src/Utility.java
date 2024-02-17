@@ -1,5 +1,3 @@
-package com.rainlandsociety;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,7 +25,6 @@ public class Utility {
     public static List<Cache> readConfiguration(String fileName) throws Exception {
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
             String jsonString = reader.lines().collect(Collectors.joining(System.lineSeparator()));
-            System.err.println(jsonString);
             CacheConfiguration cacheConfiguration = JSON.parseObject(jsonString, CacheConfiguration.class);
             List<Cache> caches = cacheConfiguration.getCaches();
             for (Cache cache : caches) {
