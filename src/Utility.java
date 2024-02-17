@@ -34,21 +34,21 @@ public class Utility {
         }
     }
 
-    public static List<MemoryOp> readProgramTrace(String fileName) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            return reader.lines()
-                    .map(line -> {
-                        String[] tokens = line.split("\\s+");
-                        //String programHex = tokens[0];
-                        String memoryHex = tokens[1];
-                        //char kind = tokens[2].charAt(0);
-                        int size = Integer.parseInt(tokens[3]);
-                        //return new MemoryOp(programHex, memoryHex, kind, size);
-                        return new MemoryOp(memoryHex, size);
-                    })
-                    .collect(Collectors.toList());
-        }
-    }
+    // public static List<MemoryOp> readProgramTrace(String fileName) throws IOException {
+    //     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+    //         return reader.lines()
+    //                 .map(line -> {
+    //                     String[] tokens = line.split("\\s+");
+    //                     //String programHex = tokens[0];
+    //                     String memoryHex = tokens[1];
+    //                     //char kind = tokens[2].charAt(0);
+    //                     int size = Integer.parseInt(tokens[3]);
+    //                     //return new MemoryOp(programHex, memoryHex, kind, size);
+    //                     return new MemoryOp(memoryHex, size);
+    //                 })
+    //                 .collect(Collectors.toList());
+    //     }
+    // }
 
     // public static List<MemoryOp> readProgramTrace(String fileName) throws IOException {
     //     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {

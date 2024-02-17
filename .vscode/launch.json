@@ -9,7 +9,7 @@
             "name": "direct bwaves",
             "request": "launch",
             "mainClass": "CacheSimulator",
-            "projectName": "Practical 1_6bd3f609",
+            "projectName": "cs4202p1_7da214ce",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
         },
         {
@@ -17,7 +17,7 @@
             "name": "direct bwaves2",
             "request": "launch",
             "mainClass": "CacheSimulator",
-            "projectName": "Practical 1_6bd3f609",
+            "projectName": "cs4202p1_7da214ce",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
         },
         {
@@ -25,7 +25,7 @@
             "name": "l1l2l3direct bwaves",
             "request": "launch",
             "mainClass": "CacheSimulator",
-            "projectName": "Practical 1_6bd3f609",
+            "projectName": "cs4202p1_7da214ce",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
         },
         {
@@ -33,7 +33,7 @@
             "name": "l1l2l3direct leela",
             "request": "launch",
             "mainClass": "CacheSimulator",
-            "projectName": "Practical 1_6bd3f609",
+            "projectName": "cs4202p1_7da214ce",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3direct.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         },
         {
@@ -41,7 +41,7 @@
             "name": "full_rr leela",
             "request": "launch",
             "mainClass": "CacheSimulator",
-            "projectName": "Practical 1_6bd3f609",
+            "projectName": "cs4202p1_7da214ce",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_rr.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         },
         {
@@ -49,7 +49,7 @@
             "name": "full_lru leela",
             "request": "launch",
             "mainClass": "CacheSimulator",
-            "projectName": "Practical 1_6bd3f609",
+            "projectName": "cs4202p1_7da214ce",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_lru.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         },
         {
@@ -57,7 +57,7 @@
             "name": "full_lfu leela",
             "request": "launch",
             "mainClass": "CacheSimulator",
-            "projectName": "Practical 1_6bd3f609",
+            "projectName": "cs4202p1_7da214ce",
             "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/full_lfu.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/leela.out"
         }
     ]

@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
@@ -16,25 +18,17 @@ public class CacheSimulator {
             // Read the cache configuration.
             simulator.caches = Utility.readConfiguration(args[0]);
 
-            // Read the program trace.
-            List<MemoryOp> programTrace = Utility.readProgramTrace(args[1]);
+            try (BufferedReader reader = new BufferedReader(new FileReader(args[1]))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    BinaryAddress memoryAddress = new BinaryAddress(Utility.hexToBinary(line.substring(17, 33)));
+                    int size = Integer.parseInt(line.substring(36, 39));
+                    simulator.simulateMemoryOp(memoryAddress, size, 0);
+                }
+            }
 
-            // Use just a few lines instead to test more quickly.
-            // First 10 lines of bwaves.
-            // List<MemoryOp> programTrace = List.of(
-            //         new MemoryOp("00007f3ba6b3f2b3", "00007ffc39282538", 'W', 8),
-            //         new MemoryOp("00007f3ba6b40054", "00007ffc39282530", 'W', 8),
-            //         new MemoryOp("00007f3ba6b40058", "00007ffc39282528", 'W', 8),
-            //         new MemoryOp("00007f3ba6b4005a", "00007ffc39282520", 'W', 8),
-            //         new MemoryOp("00007f3ba6b4005c", "00007ffc39282518", 'W', 8),
-            //         new MemoryOp("00007f3ba6b4005e", "00007ffc39282510", 'W', 8),
-            //         new MemoryOp("00007f3ba6b40060", "00007ffc39282508", 'W', 8),
-            //         new MemoryOp("00007f3ba6b40068", "00007ffc392824b8", 'W', 8),
-            //         new MemoryOp("00007f3ba6b40075", "00007f3ba6b59e0e", 'R', 1),
-            //         new MemoryOp("00007f3ba6b40075", "00007f3ba6b59e0e", 'W', 1));
-
-            // Simulate the program trace.
-            simulator.simulateProgram(programTrace);
+            // Main memory accesses is equal to misses of the lowest cache level.
+            simulator.main_memory_accesses = simulator.caches.get(simulator.caches.size() - 1).misses;
 
             // Print the results of the simulation to the console.
             Utility.printResults(simulator);
@@ -45,15 +39,35 @@ public class CacheSimulator {
         }
     }
 
-    void simulateProgram(List<MemoryOp> programTrace) {
-        // Carry out all the operations.
-        for (MemoryOp memoryOp : programTrace) {
-            simulateMemoryOp(memoryOp.memoryAddress, memoryOp.size, 0);
-        }
+    // Read the program trace.
+    // List<MemoryOp> programTrace = Utility.readProgramTrace(args[1]);
 
-        // Main memory accesses is equal to misses of the lowest cache level.
-        main_memory_accesses = caches.get(caches.size() - 1).misses;
-    }
+    // Use just a few lines instead to test more quickly.
+    // First 10 lines of bwaves.
+    // List<MemoryOp> programTrace = List.of(
+    //         new MemoryOp("00007f3ba6b3f2b3", "00007ffc39282538", 'W', 8),
+    //         new MemoryOp("00007f3ba6b40054", "00007ffc39282530", 'W', 8),
+    //         new MemoryOp("00007f3ba6b40058", "00007ffc39282528", 'W', 8),
+    //         new MemoryOp("00007f3ba6b4005a", "00007ffc39282520", 'W', 8),
+    //         new MemoryOp("00007f3ba6b4005c", "00007ffc39282518", 'W', 8),
+    //         new MemoryOp("00007f3ba6b4005e", "00007ffc39282510", 'W', 8),
+    //         new MemoryOp("00007f3ba6b40060", "00007ffc39282508", 'W', 8),
+    //         new MemoryOp("00007f3ba6b40068", "00007ffc392824b8", 'W', 8),
+    //         new MemoryOp("00007f3ba6b40075", "00007f3ba6b59e0e", 'R', 1),
+    //         new MemoryOp("00007f3ba6b40075", "00007f3ba6b59e0e", 'W', 1));
+
+    // Simulate the program trace.
+    //simulator.simulateProgram(programTrace);
+
+    // void simulateProgram(List<MemoryOp> programTrace) {
+    //     // Carry out all the operations.
+    //     for (MemoryOp memoryOp : programTrace) {
+    //         simulateMemoryOp(memoryOp.memoryAddress, memoryOp.size, 0);
+    //     }
+
+    //     // Main memory accesses is equal to misses of the lowest cache level.
+    //     main_memory_accesses = caches.get(caches.size() - 1).misses;
+    // }
 
     // Correct name?
     /**
