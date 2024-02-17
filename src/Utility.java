@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,29 +93,82 @@ public class Utility {
         return Math.log(input) / Math.log(2);
     }
 
-    public static long parseBinaryString(String binaryString) {
-        return Long.parseLong(binaryString, 2);
+    public static long hexToBinary(String hexString) {
+        return Long.parseLong(hexString, 16);
     }
 
-    public static String addOneToBinary(String binaryString, int index) {
-        // Convert binary string to char array for easy manipulation
-        char[] binaryArray = binaryString.toCharArray();
+    public static long incrementAddress(long address, int index) {
+        // Fix later...
 
-        // Start from the rightmost bit (least significant bit)
+        long number = 10; // Example long number
+        int bitPosition = 60; // Bit position to increment (0-indexed)
+        // Check if the bit at the specified position is already 1
+        if ((number & (1L << (63 - bitPosition))) != 0) {
+            // Carry
+            int carryPosition = 63 - bitPosition;
+            while ((number & (1L << carryPosition)) != 0) {
+                number &= ~(1L << carryPosition); // Clear the bit
+                carryPosition--; // Move to the previous bit position
+            }
+            number |= (1L << carryPosition); // Set the previous bit
+        } else {
+            // Bit at the specified position is 0, just set it to 1
+            number |= (1L << (63 - bitPosition));
+        }
+
+        System.out.println("Original number: " + Long.toBinaryString(10));
+        System.out.println(
+                "Number after incrementing bit at position " + bitPosition + ": " + Long.toBinaryString(number));
+
+        address = 80;
+        index = 60;
+        String binaryBefore = Long.toBinaryString(address);
+
+        // Create a mask to set the bit at the specified index
+        long mask = 1L << (Cache.ADDRESS_SPACE_SIZE - index);
+
+        // Set the bit at the specified index
+        address = address |= mask;
+
+        // Propagate carry
         for (int i = index; i >= 0; i--) {
-            if (binaryArray[i] == '0') {
-                // If the bit is '0', change it to '1' and exit the loop
-                binaryArray[i] = '1';
+            if ((address & (1L << i)) == 0) {
+                // If the bit at index i is 0, carry propagation stops
                 break;
             } else {
-                // If the bit is '1', change it to '0' and continue carrying over
-                binaryArray[i] = '0';
+                // If the bit at index i is 1, clear it and continue carry propagation
+                address = address &= ~(1L << i);
             }
         }
 
-        // Convert the modified char array back to a string
-        return String.valueOf(binaryArray);
+        String binaryAfter = Long.toBinaryString(address);
+
+        return address;
     }
+
+    // public static long parseBinaryString(String binaryString) {
+    //     return Long.parseLong(binaryString, 2);
+    // }
+
+    // public static String addOneToBinary(String binaryString, int index) {
+    //     // Convert binary string to char array for easy manipulation
+    //     char[] binaryArray = binaryString.toCharArray();
+
+    //     // Start from the rightmost bit (least significant bit)
+    //     for (int i = index; i >= 0; i--) {
+    //         if (binaryArray[i] == '0') {
+    //             // If the bit is '0', change it to '1' and exit the loop
+    //             binaryArray[i] = '1';
+    //             break;
+    //         } else {
+    //             // If the bit is '1', change it to '0' and continue carrying over
+    //             binaryArray[i] = '0';
+    //         }
+    //     }
+
+    //     // Convert the modified char array back to a string
+    //     return String.valueOf(binaryArray);
+    // }
 
     /**
      * Convert hex string to binary string -
@@ -126,15 +178,15 @@ public class Utility {
      * @param hex The string in hexadecimal digits.
      * @return The string in binary digits.
      */
-    public static String hexToBinary(String hex) {
-        int len = hex.length() * 4;
-        String bin = new BigInteger(hex, 16).toString(2);
+    // public static String hexToBinary(String hex) {
+    //     int len = hex.length() * 4;
+    //     String bin = new BigInteger(hex, 16).toString(2);
 
-        //left pad the string result with 0s if converting to BigInteger removes them.
-        bin = padBinaryString(bin, len);
+    //     //left pad the string result with 0s if converting to BigInteger removes them.
+    //     bin = padBinaryString(bin, len);
 
-        return bin;
-    }
+    //     return bin;
+    // }
 
     public static String padBinaryString(String bin, int len) {
         if (bin.length() < len) {

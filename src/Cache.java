@@ -46,7 +46,7 @@ public class Cache {
     /**
      * Other variables.
      */
-    private final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
+    public static final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
     private LinkedList<CacheLine>[] sets; // Sets of cache lines holding data.
     private ReplacementPolicy replacementPolicy;
 

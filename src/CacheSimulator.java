@@ -21,7 +21,7 @@ public class CacheSimulator {
             try (BufferedReader reader = new BufferedReader(new FileReader(args[1]))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    BinaryAddress memoryAddress = new BinaryAddress(Utility.hexToBinary(line.substring(17, 33)));
+                    BinaryAddress memoryAddress = new BinaryAddress(line.substring(17, 33));
                     int size = Integer.parseInt(line.substring(36, 39));
                     simulator.simulateMemoryOp(memoryAddress, size, 0);
                 }
