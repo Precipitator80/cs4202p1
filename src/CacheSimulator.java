@@ -1,6 +1,12 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+// import java.io.RandomAccessFile;
+// import java.nio.ByteBuffer;
+// import java.nio.channels.FileChannel;
+// import java.nio.charset.StandardCharsets;
+// import java.nio.file.Paths;
+// import java.nio.file.StandardOpenOption;
 import java.util.List;
 
 import com.alibaba.fastjson2.annotation.JSONField;
@@ -18,13 +24,42 @@ public class CacheSimulator {
             // Read the cache configuration.
             simulator.caches = Utility.readConfiguration(args[0]);
 
+            // try (FileChannel channel = FileChannel.open(Paths.get(args[1]), StandardOpenOption.READ)) {
+            //     long position = 17; // Start at the first memory address.
+            //     long fileSize = channel.size();
+
+            //     // Create buffers for the address and size.
+            //     ByteBuffer addressBuffer = ByteBuffer.allocate(16);
+            //     ByteBuffer sizeBuffer = ByteBuffer.allocate(3);
+
+            //     while (position < fileSize) {
+            //         addressBuffer.clear();
+            //         channel.read(addressBuffer, position);
+            //         addressBuffer.flip();
+            //         String addressString = new String(addressBuffer.array(), StandardCharsets.UTF_8);
+            //         BinaryAddress memoryAddress = new BinaryAddress(addressString);
+
+            //         // Move to the size part.
+            //         position += 19;
+
+            //         sizeBuffer.clear();
+            //         channel.read(sizeBuffer, position);
+            //         sizeBuffer.flip();
+            //         int size = Integer.parseInt(new String(sizeBuffer.array(), StandardCharsets.UTF_8));
+            //         simulator.simulateMemoryOp(memoryAddress, size, 0);
+
+            //         position += 21; // Move to the next line
+            //     }
+            // } catch (IOException e) {
+            //     e.printStackTrace();
+            // }
+
             try (BufferedReader reader = new BufferedReader(new FileReader(args[1]))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
+                reader.lines().forEach(line -> {
                     BinaryAddress memoryAddress = new BinaryAddress(line.substring(17, 33));
                     int size = Integer.parseInt(line.substring(36, 39));
                     simulator.simulateMemoryOp(memoryAddress, size, 0);
-                }
+                });
             }
 
             // Main memory accesses is equal to misses of the lowest cache level.
