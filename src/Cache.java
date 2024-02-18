@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -26,7 +27,7 @@ public class Cache {
     public String kind;
 
     @JSONField(name = "replacement_policy", serialize = false)
-    public String replacementPolicyString = "";
+    public String replacementPolicyString = "rr";
 
     @JSONField(name = "hits", deserialize = false)
     public int hits;
@@ -47,7 +48,7 @@ public class Cache {
      * Other variables.
      */
     public static final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
-    private LinkedList<CacheLine>[] sets; // Sets of cache lines holding data.
+    private ArrayList<LinkedList<CacheLine>> sets; // Sets of cache lines holding data.
     private ReplacementPolicy replacementPolicy;
 
     @JSONField(serialize = false, deserialize = false)
@@ -83,11 +84,12 @@ public class Cache {
         setSize = numberOfLines / numberOfSets;
 
         // Initialise sets of cache lines.
-        sets = new LinkedList[numberOfSets];
-        for (int i = 0; i < numberOfSets; i++) {
-            sets[i] = new LinkedList<>();
-            for (int j = 0; j < setSize; j++) {
-                sets[i].add(new CacheLine());
+        sets = new ArrayList<>(numberOfSets);
+        for (int setNumber = 0; setNumber < numberOfSets; setNumber++) {
+            LinkedList<CacheLine> cacheLines = new LinkedList<>();
+            sets.add(cacheLines);
+            for (int lineNumber = 0; lineNumber < setSize; lineNumber++) {
+                cacheLines.add(new CacheLine());
             }
         }
 
@@ -111,7 +113,7 @@ public class Cache {
     public boolean performOperation(BinaryAddress memoryAddress) {
         int setNumber = memoryAddress.getSet(this);
         long tag = memoryAddress.getTag(this);
-        LinkedList<CacheLine> set = sets[setNumber];
+        LinkedList<CacheLine> set = sets.get(setNumber);
         Iterator<CacheLine> setIterator = set.iterator();
         while (setIterator.hasNext()) {
             CacheLine line = setIterator.next();
