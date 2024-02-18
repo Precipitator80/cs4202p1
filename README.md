@@ -10,4 +10,4 @@ java CacheSimulator <cacheConfig.json> <programTrace.out>
 ```
 
 cacheConfig.json: Path to a JSON configuration file.  
-programTrace.out: Path to trace file  
+programTrace.out: Path to trace file.  
