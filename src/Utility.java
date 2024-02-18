@@ -1,12 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
+// import java.math.BigInteger;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.annotation.JSONField;
 
+// TODO see what more can be moved and is unnecessary. Document.
 public class Utility {
     public class CacheConfiguration {
         @JSONField(name = "caches")
@@ -84,22 +85,8 @@ public class Utility {
     //     return programTrace;
     // }
 
-    public static void printResults(CacheSimulator simulator) {
-        String jsonObject = JSON.toJSONString(simulator);
-        System.out.println(jsonObject);
-    }
-
     public static double log2(int input) {
         return Math.log(input) / Math.log(2);
-    }
-
-    public static long hexToBinary(String hexString) {
-        return Long.parseLong(hexString, 16);
-    }
-
-    public static long incrementAddress(long address, int index) {
-        long valueToAdd = 1L << (Cache.ADDRESS_SPACE_SIZE - index - 1);
-        return address + valueToAdd;
     }
 
     // public static long parseBinaryString(String binaryString) {
@@ -144,15 +131,15 @@ public class Utility {
     //     return bin;
     // }
 
-    public static String padBinaryString(String bin, int len) {
-        if (bin.length() < len) {
-            int diff = len - bin.length();
-            String pad = "";
-            for (int i = 0; i < diff; ++i) {
-                pad = pad.concat("0");
-            }
-            bin = pad.concat(bin);
-        }
-        return bin;
-    }
+    // public static String padBinaryString(String bin, int len) {
+    //     if (bin.length() < len) {
+    //         int diff = len - bin.length();
+    //         String pad = "";
+    //         for (int i = 0; i < diff; ++i) {
+    //             pad = pad.concat("0");
+    //         }
+    //         bin = pad.concat(bin);
+    //     }
+    //     return bin;
+    // }
 }

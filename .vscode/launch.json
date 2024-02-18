@@ -59,6 +59,46 @@
             "mainClass": "CacheSimulator",
             "projectName": "cs4202p1_d2d66197",
             "args": "../cs4202p1resources/sample-inputs/direct.json ../cs4202p1resources/trace-files/bwaves.out"
-        }
+        },
+        {
+            "type": "java",
+            "name": "l1l2l3direct bwaves home",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "cs4202p1_d2d66197",
+            "args": "../cs4202p1resources/sample-inputs/l1l2l3direct.json ../cs4202p1resources/trace-files/bwaves.out"
+        },
+        {
+            "type": "java",
+            "name": "l1l2l3direct leela home",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "cs4202p1_d2d66197",
+            "args": "../cs4202p1resources/sample-inputs/l1l2l3direct.json ../cs4202p1resources/trace-files/leela.out"
+        },
+        {
+            "type": "java",
+            "name": "full_rr leela home",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "cs4202p1_d2d66197",
+            "args": "../cs4202p1resources/sample-inputs/full_rr.json ../cs4202p1resources/trace-files/leela.out"
+        },
+        {
+            "type": "java",
+            "name": "full_lru leela home",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "cs4202p1_d2d66197",
+            "args": "../cs4202p1resources/sample-inputs/full_lru.json ../cs4202p1resources/trace-files/leela.out"
+        },
+        {
+            "type": "java",
+            "name": "full_lfu leela home",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "cs4202p1_d2d66197",
+            "args": "../cs4202p1resources/sample-inputs/full_lfu.json ../cs4202p1resources/trace-files/leela.out"
+        },
     ]
 }

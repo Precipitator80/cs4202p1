@@ -1,9 +1,10 @@
+// TODO Not using this, but still explain it.
 public class MemoryOp {
     public MemoryOp(String programHex, String memoryHex, char kind, int size) {
         this(memoryHex, size);
         // programCounterAddress = convertHexStringToLong(programHex);
         // memoryAddress = convertHexStringToLong(memoryHex);
-        programCounterAddress = new BinaryAddress(Utility.hexToBinary(programHex));
+        programCounterAddress = new BinaryAddress(programHex);
         switch (kind) {
             case 'R':
                 this.kind = Kind.R;
@@ -17,7 +18,7 @@ public class MemoryOp {
     }
 
     public MemoryOp(String memoryHex, int size) {
-        memoryAddress = new BinaryAddress(Utility.hexToBinary(memoryHex));
+        memoryAddress = new BinaryAddress(memoryHex);
         this.size = size;
     }
 

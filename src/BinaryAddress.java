@@ -1,75 +1,94 @@
 /**
- * Use to convert hex string to binary string, which is then later converted to a cache-specific address.
-     * Parsing required:
-     * Hex String → Binary String → Index, Offset and Tag.
+ * Class to store and get parts of a binary address.
+ * Conversion: Hex String → Binary long → Tag, Set and Offset.
  */
 public class BinaryAddress {
+    /**
+     * Initialises a binary address by converting a hex string into a long.
+     * @param hexString The hexadecimal string representation of a binary address.
+     */
     public BinaryAddress(String hexString) {
-        this(Utility.hexToBinary(hexString));
-    }
-
-    public BinaryAddress(long binaryLong) {
-        this.binaryLong = binaryLong;
-    }
-
-    //String binaryString;
-    long binaryLong;
-
-    public BinaryAddress nextBlock(Cache cache) {
-        return new BinaryAddress(
-                Utility.incrementAddress(binaryLong, cache.getTagSize() + cache.getSetIdentSize() - 1));
+        this(Long.parseLong(hexString, 16));
     }
 
     /**
-     * An address parser that parses indices, offsets and tags of an address given their size within the address.
-     * TODO ARE THESE DATA TYPES OK (INT)?
+     * Initialises a binary address with the a long representation of a binary address.
+     * @param binaryLong The long representation of a binary address.
      */
+    public BinaryAddress(long binaryLong) {
+        this.address = binaryLong;
+    }
+
+    long address; // A long representing a binary address. Longs use 64-bits, which lets masking be used to check individual parts of the address.
+
+    /**
+     * Gets the next block adjacent to the block this binary address represents.
+     * @param cache The cache used for translation.
+     * @return The next block adjacent to this address.
+     */
+    public BinaryAddress nextBlock(Cache cache) {
+        // Add the long value of the lowest bit associated with the offset.
+        long valueToAdd = 1L << cache.getOffsetBits();
+        long adjacentAddress = address + valueToAdd;
+        return new BinaryAddress(adjacentAddress);
+    }
 
     /**
      * Gets the tag of this address for a specific cache.
-     * This identifies the block number within the mapped to set.
+     * This is held at the start of an address and identifies the block number within the mapped to set.
      * @param cache The cache to translate to.
      * @return The tag of the address for the given cache.
      */
     public long getTag(Cache cache) {
-        int tagSize = cache.getTagSize();
-        // Calculate the number of bits needed for the offset and index parts
-        int offsetIndexBits = Long.SIZE - tagSize;
+        // Determine the number of bits to shift the address to the right to remove the set and offset.
+        int bitsToShift = Cache.ADDRESS_SPACE_SIZE - cache.getTagBits();
 
-        // Create a mask to extract the tag bits
-        long tagMask = (1L << tagSize) - 1;
-
-        // Extract the tag bits using bitwise AND
-        long tag = binaryLong >>> offsetIndexBits & tagMask;
-
-        return tag;
+        // Get the tag by doing an unsigned shift to the right, getting rid of the other parts of the address.
+        return address >>> bitsToShift;
     }
+
+    /**
+     * Gets the set number of this address for a specific cache.
+     * This is held in the middle of an address.
+     * @param cache The cache to translate to.
+     * @return The set number of the address.
+     */
+    public int getSet(Cache cache) {
+        // Determine the number of bits to shift the address to the right to remove the offset.
+        int offsetBits = cache.getOffsetBits();
+
+        // Define a mask to take only the final bits of the shifted address, which correspond to the set.
+        long setMask = (1L << cache.getSetBits()) - 1;
+
+        // Get the set by shifting the address and then extracting the final bits using the mask.
+        return (int) ((address >>> offsetBits) & setMask);
+    }
+
+    /**
+     * Gets the offset of an address for a specific cache.
+     * This is held at the end of an address and identifies a chunk of data within a block.
+     * @param cache The cache to translate to.
+     * @return The offset of the address.
+     */
+    public long getOffset(Cache cache) {
+        // Define a mask to take only the final bits of the address, which correspond to the offset.
+        long offsetMask = (1L << cache.getOffsetBits()) - 1;
+
+        // Get the offset by masking the address using the offset mask.
+        return address & offsetMask;
+    }
+
+    /// String version of BinaryAddress. This was significantly slower compared to using a long representation due to the large number of string operations required.
+    /**
+     * Conversion from hex string:
+     * Hex String → Binary String → Tag, Set and Offset.
+     */
+
+    //String binaryString; // A 64 character string of 0s and 1s representing a 64-bit binary address.
 
     // public long getTag(Cache cache) {
     //     return Utility.parseBinaryString(binaryString.substring(0, cache.getTagSize()));
     // }
-
-    /**
-     * Gets the index of this address for a specific cache.
-     * This identifies the set number that the address is mapped to.
-     * @param cache The cache to translate to.
-     * @return The index of the address.
-     */
-    public int getSet(Cache cache) {
-        int tagSize = cache.getTagSize();
-        int setIdentSize = cache.getSetIdentSize();
-
-        // Calculate the number of bits needed for the offset, index, and tag parts
-        int offsetIndexBits = Long.SIZE - (tagSize + setIdentSize);
-
-        // Create a mask to extract the set bits
-        long setMask = (1L << setIdentSize) - 1;
-
-        // Extract the set bits using bitwise AND
-        int set = (int) ((binaryLong >>> offsetIndexBits) & setMask);
-
-        return set;
-    }
 
     // public int getSet(Cache cache) {
     //     if (cache.getSetIdentSize() == 0) {
@@ -79,29 +98,6 @@ public class BinaryAddress {
     //     int endIndex = startIndex + cache.getSetIdentSize();
     //     return (int) Utility.parseBinaryString(binaryString.substring(startIndex, endIndex));
     // }
-
-    /**
-     * Gets the offset of an address for a specific cache.
-     * This identifies a chunk of data within a block.
-     * @param cache The cache to translate to.
-     * @return The offset of the address.
-     */
-    public long getOffset(Cache cache) {
-        int tagSize = cache.getTagSize();
-        int setIdentSize = cache.getSetIdentSize();
-        int offsetIdentSize = cache.getOffsetIdentSize();
-
-        // Calculate the number of bits needed for the offset, index, and tag parts
-        int offsetIndexBits = Long.SIZE - (tagSize + setIdentSize + offsetIdentSize);
-
-        // Create a mask to extract the offset bits
-        long offsetMask = (1L << offsetIdentSize) - 1;
-
-        // Extract the offset bits using bitwise AND
-        long offset = binaryLong & offsetMask;
-
-        return offset;
-    }
 
     // public long getOffset(Cache cache) {
     //     int startIndex = cache.getTagSize() + cache.getSetIdentSize();

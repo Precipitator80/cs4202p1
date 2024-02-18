@@ -5,6 +5,52 @@ import java.util.LinkedList;
 import com.alibaba.fastjson2.annotation.JSONField;
 
 public class Cache {
+    /**
+     * JSON fields used in serialisation and / or deserialisation.
+     */
+    @JSONField(name = "name")
+    public String name; // The name of the cache.
+
+    @JSONField(name = "size", serialize = false)
+    public int size; // The total size of the cache in bytes.
+
+    @JSONField(name = "line_size", serialize = false)
+    public int lineSize; // The size of each cache line in bytes.
+
+    @JSONField(name = "kind", serialize = false)
+    public String kind; // The kind of cache.
+
+    @JSONField(name = "replacement_policy", serialize = false)
+    public String replacementPolicyString = "rr"; // A string representation of the replacement / eviction policy.
+
+    @JSONField(name = "hits", deserialize = false)
+    public int hits; // The number of hits of this cache after simulating a program.
+
+    @JSONField(name = "misses", deserialize = false)
+    public int misses; // The number of misses of this cache after simulating a program.
+
+    /**
+     * Other variables used throughout the code.
+     */
+    public static final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits. At 64 this is the same as Long.SIZE.
+    private ArrayList<LinkedList<CacheLine>> sets; // Sets of cache lines holding memory addresses.
+    private ReplacementPolicy replacementPolicy; // The replacement / eviction policy of the cache as an enum value.
+    @JSONField(name = "accesses", serialize = false, deserialize = false)
+    private int accesses; // The number of accesses of this cache. Used for diagnostics.
+    @JSONField(name = "block_overruns", serialize = false, deserialize = false)
+    public int blockOverruns; // The number of block overruns of this cache. Used for diagnostics.
+    @JSONField(name = "set_size", serialize = false, deserialize = false)
+    private int setSize; // The number of cache lines per set.
+    @JSONField(serialize = false, deserialize = false)
+    private int setBits; // The number of bits used for the set (i.e. index in direct caches) in cache addressing.
+    @JSONField(serialize = false, deserialize = false)
+    private int offsetBits; // The number of bits used for the offset in cache addressing.
+    @JSONField(serialize = false, deserialize = false)
+    private int tagBits; // The number of bits used for the tag in cache addressing.
+
+    /**
+     * An enum holding replacement / eviction policies to make checking simpler and faster.
+     */
     enum ReplacementPolicy {
         RR,
         LRU,
@@ -12,54 +58,11 @@ public class Cache {
     }
 
     /**
-     * JSON Fields
+     * An initialisation method used instead of a constructor to let JSON parsing to use the default constructor.
+     * @throws Exception if the cache kind specified in the JSON is unsupported.
      */
-    @JSONField(name = "name")
-    public String name;
-
-    @JSONField(name = "size", serialize = false)
-    public int size;
-
-    @JSONField(name = "line_size", serialize = false)
-    public int lineSize;
-
-    @JSONField(name = "kind", serialize = false)
-    public String kind;
-
-    @JSONField(name = "replacement_policy", serialize = false)
-    public String replacementPolicyString = "rr";
-
-    @JSONField(name = "hits", deserialize = false)
-    public int hits;
-
-    @JSONField(name = "misses", deserialize = false)
-    public int misses;
-
-    @JSONField(name = "accesses", serialize = false, deserialize = false)
-    public int accesses;
-
-    @JSONField(name = "block_overruns", serialize = false, deserialize = false)
-    public int blockOverruns;
-
-    @JSONField(name = "block_overruns", serialize = false, deserialize = false)
-    public int setSize;
-
-    /**
-     * Other variables.
-     */
-    public static final int ADDRESS_SPACE_SIZE = 64; // The size of the address space in bits.
-    private ArrayList<LinkedList<CacheLine>> sets; // Sets of cache lines holding data.
-    private ReplacementPolicy replacementPolicy;
-
-    @JSONField(serialize = false, deserialize = false)
-    private int setIdentSize; // The index size of the cache.
-    @JSONField(serialize = false, deserialize = false)
-    private int offsetIdentSize; // The offset size of the cache.
-    @JSONField(serialize = false, deserialize = false)
-    private int tagSize; // The tag size of the cache.
-
     void initialise() throws Exception {
-        // Define the sets.
+        // Define set properties by considering the number of lines in the cache and the kind of cache.
         int numberOfLines = size / lineSize;
         int numberOfSets;
         switch (kind) {
@@ -83,7 +86,7 @@ public class Cache {
         }
         setSize = numberOfLines / numberOfSets;
 
-        // Initialise sets of cache lines.
+        // Initialise each set with cache lines.
         sets = new ArrayList<>(numberOfSets);
         for (int setNumber = 0; setNumber < numberOfSets; setNumber++) {
             LinkedList<CacheLine> cacheLines = new LinkedList<>();
@@ -105,12 +108,19 @@ public class Cache {
                 replacementPolicy = ReplacementPolicy.RR;
         }
 
-        setIdentSize = (int) Utility.log2(numberOfSets);
-        offsetIdentSize = (int) Utility.log2(lineSize);
-        tagSize = ADDRESS_SPACE_SIZE - setIdentSize - offsetIdentSize;
+        // Calculate the number of bits used for each part for addressing this cache.
+        setBits = (int) Utility.log2(numberOfSets);
+        offsetBits = (int) Utility.log2(lineSize);
+        tagBits = ADDRESS_SPACE_SIZE - setBits - offsetBits;
     }
 
+    /**
+     * TODO
+     * @param memoryAddress
+     * @return
+     */
     public boolean performOperation(BinaryAddress memoryAddress) {
+        accesses++;
         int setNumber = memoryAddress.getSet(this);
         long tag = memoryAddress.getTag(this);
         LinkedList<CacheLine> set = sets.get(setNumber);
@@ -160,6 +170,11 @@ public class Cache {
         return false;
     }
 
+    /**
+     * Evicts a block from the cache and replaces it.
+     * @param set The set that the cache line is a part of.
+     * @param newTag The tag of the new block.
+     */
     void replace(LinkedList<CacheLine> set, long newTag) {
         switch (replacementPolicy) {
             case LRU:
@@ -188,35 +203,15 @@ public class Cache {
     /**
      * Getters
      */
-    public int getSetIdentSize() {
-        return setIdentSize;
+    public int getSetBits() {
+        return setBits;
     }
 
-    public int getOffsetIdentSize() {
-        return offsetIdentSize;
+    public int getOffsetBits() {
+        return offsetBits;
     }
 
-    public int getTagSize() {
-        return tagSize;
+    public int getTagBits() {
+        return tagBits;
     }
-
-    /*
-    First 10 lines of bwaves.
-    16-digit 64-bit hexadecimal values, corresponding to a 64-bit
-    simulated address space. Therefore, pointers are 64-bits in size.
-    number_of_lines = cache_size / line_size
-    index = log_2(number_of_lines)
-    offset = log_2(line_size)
-    tag = address_size - offset - index.
-    00007f3ba6b3f2b3 00007ffc39282538 W 008
-    00007f3ba6b40054 00007ffc39282530 W 008
-    00007f3ba6b40058 00007ffc39282528 W 008
-    00007f3ba6b4005a 00007ffc39282520 W 008
-    00007f3ba6b4005c 00007ffc39282518 W 008
-    00007f3ba6b4005e 00007ffc39282510 W 008
-    00007f3ba6b40060 00007ffc39282508 W 008
-    00007f3ba6b40068 00007ffc392824b8 W 008
-    00007f3ba6b40075 00007f3ba6b59e0e R 001
-    00007f3ba6b40075 00007f3ba6b59e0e W 001
-     */
 }
