@@ -98,52 +98,8 @@ public class Utility {
     }
 
     public static long incrementAddress(long address, int index) {
-        // Fix later...
-
-        long number = 10; // Example long number
-        int bitPosition = 60; // Bit position to increment (0-indexed)
-        // Check if the bit at the specified position is already 1
-        if ((number & (1L << (63 - bitPosition))) != 0) {
-            // Carry
-            int carryPosition = 63 - bitPosition;
-            while ((number & (1L << carryPosition)) != 0) {
-                number &= ~(1L << carryPosition); // Clear the bit
-                carryPosition--; // Move to the previous bit position
-            }
-            number |= (1L << carryPosition); // Set the previous bit
-        } else {
-            // Bit at the specified position is 0, just set it to 1
-            number |= (1L << (63 - bitPosition));
-        }
-
-        System.out.println("Original number: " + Long.toBinaryString(10));
-        System.out.println(
-                "Number after incrementing bit at position " + bitPosition + ": " + Long.toBinaryString(number));
-
-        address = 80;
-        index = 60;
-        String binaryBefore = Long.toBinaryString(address);
-
-        // Create a mask to set the bit at the specified index
-        long mask = 1L << (Cache.ADDRESS_SPACE_SIZE - index);
-
-        // Set the bit at the specified index
-        address = address |= mask;
-
-        // Propagate carry
-        for (int i = index; i >= 0; i--) {
-            if ((address & (1L << i)) == 0) {
-                // If the bit at index i is 0, carry propagation stops
-                break;
-            } else {
-                // If the bit at index i is 1, clear it and continue carry propagation
-                address = address &= ~(1L << i);
-            }
-        }
-
-        String binaryAfter = Long.toBinaryString(address);
-
-        return address;
+        long valueToAdd = 1L << (Cache.ADDRESS_SPACE_SIZE - index - 1);
+        return address + valueToAdd;
     }
 
     // public static long parseBinaryString(String binaryString) {
