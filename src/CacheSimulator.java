@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.annotation.JSONField;
@@ -34,7 +35,7 @@ public class CacheSimulator {
     void simulate(String cacheConfigFileName, String programTraceFileName) {
         try {
             // Read the cache configuration.
-            caches = Utility.readConfiguration(cacheConfigFileName);
+            readConfiguration(cacheConfigFileName);
 
             // Read in and simulate each memory operation.
             try (BufferedReader reader = new BufferedReader(new FileReader(programTraceFileName))) {
@@ -94,6 +95,30 @@ public class CacheSimulator {
      */
     boolean fitsInLine(long offset, int opSize, int lineSize) {
         return (offset + opSize) <= lineSize;
+    }
+
+    public class CacheConfiguration {
+        @JSONField(name = "caches")
+        List<Cache> caches;
+
+        public List<Cache> getCaches() {
+            return caches;
+        }
+
+        public void setCaches(List<Cache> caches) {
+            this.caches = caches;
+        }
+    }
+
+    public void readConfiguration(String fileName) throws Exception {
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String jsonString = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            CacheConfiguration cacheConfiguration = JSON.parseObject(jsonString, CacheConfiguration.class);
+            caches = cacheConfiguration.getCaches();
+            for (Cache cache : caches) {
+                cache.initialise();
+            }
+        }
     }
 
     //// LEGACY CODE AND DISCUSSION
@@ -197,5 +222,149 @@ public class CacheSimulator {
     //
     //     // Main memory accesses is equal to misses of the lowest cache level.
     //     main_memory_accesses = caches.get(caches.size() - 1).misses;
+    // }
+
+    //// A class to represent memory operations.
+    //// Was deemed redundant as the program counter and op kind are ignored.
+    //// The rest of the values can be passed directly instead of allocating an object.
+    // import java.math.BigInteger;
+    // public class MemoryOp {
+    //     public MemoryOp(String programHex, String memoryHex, char kind, int size) {
+    //         this(memoryHex, size);
+    //         programCounterAddress = new BinaryAddress(programHex);
+    //         switch (kind) {
+    //             case 'R':
+    //                 this.kind = Kind.R;
+    //                 break;
+    //             case 'W':
+    //                 this.kind = Kind.W;
+    //                 break;
+    //             default:
+    //                 throw new IllegalArgumentException("Memory operation kind must be either R or W!");
+    //         }
+    //     }
+    //
+    //     public MemoryOp(String memoryHex, int size) {
+    //         memoryAddress = new BinaryAddress(memoryHex);
+    //         this.size = size;
+    //     }
+    //
+    //     enum Kind {
+    //         R,
+    //         W
+    //     }
+    //
+    //     BinaryAddress programCounterAddress;
+    //     BinaryAddress memoryAddress;
+    //     Kind kind;
+    //     public int size;
+    // }
+
+    //// Various versions of a method to read the full program trace as a list.
+    //// The top version did have efficiency gains over the others, but was still redundant when running operations directly after reads.
+    // public static List<MemoryOp> readProgramTrace(String fileName) throws IOException {
+    //     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+    //         return reader.lines()
+    //                 .map(line -> {
+    //                     String[] tokens = line.split("\\s+");
+    //                     //String programHex = tokens[0];
+    //                     String memoryHex = tokens[1];
+    //                     //char kind = tokens[2].charAt(0);
+    //                     int size = Integer.parseInt(tokens[3]);
+    //                     //return new MemoryOp(programHex, memoryHex, kind, size);
+    //                     return new MemoryOp(memoryHex, size);
+    //                 })
+    //                 .collect(Collectors.toList());
+    //     }
+    // }
+
+    // public static List<MemoryOp> readProgramTrace(String fileName) throws IOException {
+    //     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+    //         List<MemoryOp> programTrace = new LinkedList<>();
+    //         List<String> lines = reader.lines().collect(Collectors.toList());
+    //         for (String line : lines) {
+    //
+    //             String[] tokens = line.split("\\s+");
+    //             String programHex = tokens[0];
+    //             String memoryHex = tokens[1];
+    //             char kind = tokens[2].toCharArray()[0];
+    //             int size = Integer.parseInt(tokens[3]);
+    //
+    //             programTrace.add(new MemoryOp(programHex, memoryHex, kind, size));
+    //         }
+    //         return programTrace;
+    //     }
+    // }
+
+    // public static List<MemoryOp> readProgramTrace(String fileName) throws IOException {
+    //     List<MemoryOp> programTrace = new LinkedList<>();
+    //     try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+    //         String line;
+    //         while ((line = reader.readLine()) != null) {
+    //             String[] tokens = line.split("\\s+");
+    //             String programHex = tokens[0];
+    //             String memoryHex = tokens[1];
+    //             char kind = tokens[2].toCharArray()[0];
+    //             int size = Integer.parseInt(tokens[3]);
+    //
+    //             programTrace.add(new MemoryOp(programHex, memoryHex, kind, size));
+    //         }
+    //     }
+    //     return programTrace;
+    // }
+
+    //// Some utility methods for working with the binary string representation of binary addresses.
+    // public static long parseBinaryString(String binaryString) {
+    //     return Long.parseLong(binaryString, 2);
+    // }
+
+    // public static String addOneToBinary(String binaryString, int index) {
+    //     // Convert binary string to char array for easy manipulation
+    //     char[] binaryArray = binaryString.toCharArray();
+    //
+    //     // Start from the rightmost bit (least significant bit)
+    //     for (int i = index; i >= 0; i--) {
+    //         if (binaryArray[i] == '0') {
+    //             // If the bit is '0', change it to '1' and exit the loop
+    //             binaryArray[i] = '1';
+    //             break;
+    //         } else {
+    //             // If the bit is '1', change it to '0' and continue carrying over
+    //             binaryArray[i] = '0';
+    //         }
+    //     }
+    //
+    //     // Convert the modified char array back to a string
+    //     return String.valueOf(binaryArray);
+    // }
+
+    /**
+     * Convert hex string to binary string -
+     * CapnChaos -
+     * https://stackoverflow.com/questions/8640803/convert-hex-string-to-binary-string -
+     * Accessed 05.02.2024
+     * @param hex The string in hexadecimal digits.
+     * @return The string in binary digits.
+     */
+    // public static String hexToBinary(String hex) {
+    //     int len = hex.length() * 4;
+    //     String bin = new BigInteger(hex, 16).toString(2);
+    //
+    //     //left pad the string result with 0s if converting to BigInteger removes them.
+    //     bin = padBinaryString(bin, len);
+    //
+    //     return bin;
+    // }
+
+    // public static String padBinaryString(String bin, int len) {
+    //     if (bin.length() < len) {
+    //         int diff = len - bin.length();
+    //         String pad = "";
+    //         for (int i = 0; i < diff; ++i) {
+    //             pad = pad.concat("0");
+    //         }
+    //         bin = pad.concat(bin);
+    //     }
+    //     return bin;
     // }
 }

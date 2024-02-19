@@ -78,7 +78,9 @@ public class BinaryAddress {
         return address & offsetMask;
     }
 
-    /// String version of BinaryAddress. This was significantly slower compared to using a long representation due to the large number of string operations required.
+    //// String version of BinaryAddress.
+    //// This was significantly slower compared to using a long representation due to the large number of string operations required.
+    //// Some utility methods used were kept in a separate class, the code of which is now in the scrap code section of CacheSimulator.java.
     /**
      * Conversion from hex string:
      * Hex String → Binary String → Tag, Set and Offset.

@@ -109,65 +109,85 @@ public class Cache {
         }
 
         // Calculate the number of bits used for each part for addressing this cache.
-        setBits = (int) Utility.log2(numberOfSets);
-        offsetBits = (int) Utility.log2(lineSize);
+        setBits = (int) log2(numberOfSets);
+        offsetBits = (int) log2(lineSize);
         tagBits = ADDRESS_SPACE_SIZE - setBits - offsetBits;
     }
 
     /**
-     * TODO
-     * @param memoryAddress
-     * @return
+     * Returns the logarithm with base 2 of a int value.
+     * @param value The value to get the logarithm of.
+     * @return The logarithm with base 2 of the input value.
+     */
+    public double log2(int value) {
+        return Math.log(value) / Math.log(2);
+    }
+
+    /**
+     * Performs a memory operation on a cache line with consideration for replacement policy.
+     * @param memoryAddress The memory address of the memory operation.
+     * @return Whether the memory operation resulted in a hit or not (miss).
      */
     public boolean performOperation(BinaryAddress memoryAddress) {
+        // Keep track of cache accesses.
         accesses++;
+
+        // Get the correct set and block number by translating the memory address to get its set and tag for this cache.
         int setNumber = memoryAddress.getSet(this);
         long tag = memoryAddress.getTag(this);
         LinkedList<CacheLine> set = sets.get(setNumber);
+
+        // Look through the set to look for a line matching the existing tag.
         Iterator<CacheLine> setIterator = set.iterator();
         while (setIterator.hasNext()) {
             CacheLine line = setIterator.next();
+            // If the line does not have its valid bit set, it is a compulsory miss.
             if (!line.getValid()) {
-                // Compulsory miss!
+                // Track the miss and update the line.
                 misses++;
                 line.updateTag(tag);
-                // Move back to the front of the list for LRU and RR.
+
+                // Initialise the line.
                 switch (replacementPolicy) {
                     case LFU:
+                        // Reset the frequency of the line for LFU.
                         line.resetFrequency();
                         break;
                     default:
+                        // Move back to the front of the list for LRU and RR.
                         if (line != set.peek()) {
                             setIterator.remove();
                             set.addFirst(line);
                         }
                 }
-                return false;
-            } else if (line.getTag() == tag) {
-                // Hit!
+                return false; // Return as a miss.
+            } else if (line.getTag() == tag) { // If the line is valid and the tag matches, it is a hit.
                 hits++;
 
-                // Refresh
+                // Refresh the line.
                 switch (replacementPolicy) {
                     case LRU:
+                        // Move the line back to the front of the cache line list if not already for LRU.
                         if (line != set.peek()) {
                             setIterator.remove();
                             set.addFirst(line);
                         }
                         break;
                     case LFU:
-                        // Refresh frequency
+                        // Increment the frequency for LFU.
                         line.incrementFrequency();
                         break;
                     default: // Nothing to do for RR.
                 }
-                return true;
+                return true; // Return as a hit.
             }
         }
-        // Capacity / conflict miss! Evict and replace.
+
+        // If we didn't miss because of the valid bit, then this is either a capacity or a conflict miss.
+        // Evict and replace the line.
         misses++;
         replace(set, tag);
-        return false;
+        return false; // Return as a miss.
     }
 
     /**
@@ -177,13 +197,8 @@ public class Cache {
      */
     void replace(LinkedList<CacheLine> set, long newTag) {
         switch (replacementPolicy) {
-            case LRU:
-                CacheLine leastRecentlyUsed = set.removeLast();
-                leastRecentlyUsed.updateTag(newTag);
-                set.addFirst(leastRecentlyUsed);
-                break;
             case LFU:
-                // Evict least frequently used cache line
+                // Evict the least frequently used cache line for LFU by checking the frequency of each.
                 CacheLine leastFrequentlyUsed = set.getFirst();
                 for (CacheLine line : set) {
                     if (line.getFrequency() < leastFrequentlyUsed.getFrequency()) {
@@ -193,25 +208,39 @@ public class Cache {
                 leastFrequentlyUsed.updateTag(newTag);
                 leastFrequentlyUsed.resetFrequency();
                 break;
-            default: // RR
-                CacheLine last = set.removeLast();
-                last.updateTag(newTag);
-                set.addFirst(last);
+            default:
+                // Move the line at the back of the cache line list to the front and update it with the new tag for LRU and RR.
+                CacheLine lastLine = set.removeLast();
+                lastLine.updateTag(newTag);
+                set.addFirst(lastLine);
         }
     }
 
     /**
      * Getters
      */
+
+    /**
+     * Gets the number of tag bits used by this cache.
+     * @return The number of tag bits used by this cache.
+     */
+    public int getTagBits() {
+        return tagBits;
+    }
+
+    /**
+     * Gets the number of set bits used by this cache.
+     * @return The number of set bits used by this cache.
+     */
     public int getSetBits() {
         return setBits;
     }
 
+    /**
+     * Gets the number of offset bits used by this cache.
+     * @return The number of offset bits used by this cache.
+     */
     public int getOffsetBits() {
         return offsetBits;
-    }
-
-    public int getTagBits() {
-        return tagBits;
     }
 }
