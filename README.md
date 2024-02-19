@@ -6,7 +6,7 @@ Makefile all
 
 After this, the simulator can be run with the following command:
 ```
-java CacheSimulator <cacheConfig.json> <programTrace.out>
+java -cp ".:../lib/fastjson2-2.0.45.android4.jar" CacheSimulator <cacheConfig.json> <programTrace.out>
 ```
 
 cacheConfig.json: Path to a JSON configuration file.  

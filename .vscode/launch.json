@@ -14,6 +14,14 @@
         },
         {
             "type": "java",
+            "name": "l1l2l3 bwaves",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "cs4202p1_7da214ce",
+            "args": "/cs/studres/CS4202/Coursework/P1-CacheSim/sample-inputs/l1l2l3.json /cs/studres/CS4202/Coursework/P1-CacheSim/trace-files/bwaves.out"
+        },
+        {
+            "type": "java",
             "name": "l1l2l3direct bwaves",
             "request": "launch",
             "mainClass": "CacheSimulator",
@@ -67,6 +75,14 @@
             "mainClass": "CacheSimulator",
             "projectName": "cs4202p1_d2d66197",
             "args": "../cs4202p1resources/sample-inputs/direct.json ../cs4202p1resources/trace-files/bwaves.out"
+        },
+        {
+            "type": "java",
+            "name": "l1l2l3 bwaves home",
+            "request": "launch",
+            "mainClass": "CacheSimulator",
+            "projectName": "cs4202p1_d2d66197",
+            "args": "../cs4202p1resources/sample-inputs/l1l2l3.json ../cs4202p1resources/trace-files/bwaves.out"
         },
         {
             "type": "java",
