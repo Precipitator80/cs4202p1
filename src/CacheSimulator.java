@@ -58,12 +58,6 @@ public class CacheSimulator {
         }
     }
 
-    /*
-     * Only happens on lower cache levels.
-     * 
-     * 
-     */
-
     /**
      * Simulates a memory operation.
      * @param memoryAddress The memory address of the operation.

@@ -4,6 +4,11 @@ To compile, run the following in the src folder:
 make all
 ```
 
+If make is not supported, run the compilation command manually:
+```
+javac *.java -cp ../lib/fastjson2-2.0.45.android4.jar
+```
+
 After this, the simulator can be run with the following command:
 ```
 java -cp ".:../lib/fastjson2-2.0.45.android4.jar" CacheSimulator <cacheConfig.json> <programTrace.out>
