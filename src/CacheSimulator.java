@@ -58,6 +58,12 @@ public class CacheSimulator {
         }
     }
 
+    /*
+     * Only happens on lower cache levels.
+     * 
+     * 
+     */
+
     /**
      * Simulates a memory operation.
      * @param memoryAddress The memory address of the operation.
@@ -68,23 +74,18 @@ public class CacheSimulator {
         Cache cache = caches.get(cacheIndex);
         boolean hit = cache.performOperation(memoryAddress);
 
-        // Check whether the operation fits in the cache line.
-        boolean fitsInLine = fitsInLine(memoryAddress.getOffset(cache), size, cache.lineSize);
+        // Track the size remaining in the line for misses and block overruns.
+        int lineSizeRemaining = cache.lineSize - (int) memoryAddress.getOffset(cache);
 
-        // On a miss, run the same memory operation on the next level if available.
+        // On a miss, run the attempted part of same memory operation on the next level if available.
         if (!hit && cacheIndex < caches.size() - 1) {
-            // If the memory operation does not fit in the line, run it with a reduced size.
-            if (fitsInLine) {
-                simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
-            } else {
-                simulateMemoryOp(memoryAddress, cache.lineSize, cacheIndex + 1);
-            }
+            simulateMemoryOp(memoryAddress, lineSizeRemaining, cacheIndex + 1);
         }
 
         // If the operation did not fit on the line, run it again for the next block on the same level.
-        if (!fitsInLine) {
+        if (!fitsInLine(size, lineSizeRemaining)) {
             // Mark this as an overrun and subtract a hit to avoid counting the overrun as a hit on the same level.
-            cache.blockOverruns++;
+            cache.overruns++;
             if (cacheIndex > 0) {
                 cache.hits--;
             }
@@ -97,13 +98,12 @@ public class CacheSimulator {
 
     /**
      * Calculates whether a memory operation fits in a specific cache line.
-     * @param offset The offset within the cache line.
      * @param opSize The size of the operation.
-     * @param lineSize The size of the cache line.
+     * @param lineSizeRemaining The size left in the cache line, accounting for the offset of the operation within the line.
      * @return Whether the memory operation fits in the cache line.
      */
-    boolean fitsInLine(long offset, int opSize, int lineSize) {
-        return (offset + opSize) <= lineSize;
+    boolean fitsInLine(int opSize, int lineSizeRemaining) {
+        return opSize <= lineSizeRemaining;
     }
 
     /**

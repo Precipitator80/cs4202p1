@@ -37,8 +37,8 @@ public class Cache {
     private ReplacementPolicy replacementPolicy; // The replacement / eviction policy of the cache as an enum value.
     @JSONField(name = "accesses", serialize = false, deserialize = false)
     private int accesses; // The number of accesses of this cache. Used for diagnostics.
-    @JSONField(name = "block_overruns", serialize = false, deserialize = false)
-    public int blockOverruns; // The number of block overruns of this cache. Used for diagnostics.
+    @JSONField(name = "overruns", serialize = false, deserialize = false)
+    public int overruns; // The number of overruns of this cache. Used for diagnostics.
     @JSONField(name = "set_size", serialize = false, deserialize = false)
     private int setSize; // The number of cache lines per set.
     @JSONField(serialize = false, deserialize = false)
