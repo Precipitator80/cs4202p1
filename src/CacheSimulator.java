@@ -97,6 +97,10 @@ public class CacheSimulator {
         return (offset + opSize) <= lineSize;
     }
 
+    /**
+     * Special class to support loading caches via JSON parsing.
+     * Holds a field for a cache list in addition to getter and setter methods used automatically.
+     */
     public class CacheConfiguration {
         @JSONField(name = "caches")
         List<Cache> caches;
@@ -110,10 +114,18 @@ public class CacheSimulator {
         }
     }
 
-    public void readConfiguration(String fileName) throws Exception {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+    /**
+     * Reads a cache configuration and initialises each cache read.
+     * @param cacheConfigFileName The file name of the cache config.
+     * @throws Exception If there is an issue reading the config file or initialising each cache.
+     */
+    public void readConfiguration(String cacheConfigFileName) throws Exception {
+        try (BufferedReader reader = new BufferedReader(new FileReader(cacheConfigFileName))) {
+            // Read the JSON string and parse it to get cache information.
             String jsonString = reader.lines().collect(Collectors.joining(System.lineSeparator()));
             CacheConfiguration cacheConfiguration = JSON.parseObject(jsonString, CacheConfiguration.class);
+
+            // Initialise each of the caches.
             caches = cacheConfiguration.getCaches();
             for (Cache cache : caches) {
                 cache.initialise();
