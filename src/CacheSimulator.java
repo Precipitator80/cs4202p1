@@ -67,13 +67,22 @@ public class CacheSimulator {
     void simulateMemoryOp(BinaryAddress memoryAddress, int size, int cacheIndex) {
         Cache cache = caches.get(cacheIndex);
         boolean hit = cache.performOperation(memoryAddress);
+
+        // Check whether the operation fits in the cache line.
+        boolean fitsInLine = fitsInLine(memoryAddress.getOffset(cache), size, cache.lineSize);
+
         // On a miss, run the same memory operation on the next level if available.
         if (!hit && cacheIndex < caches.size() - 1) {
-            simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
+            // If the memory operation does not fit in the line, run it with a reduced size.
+            if (fitsInLine) {
+                simulateMemoryOp(memoryAddress, size, cacheIndex + 1);
+            } else {
+                simulateMemoryOp(memoryAddress, cache.lineSize, cacheIndex + 1);
+            }
         }
 
         // If the operation did not fit on the line, run it again for the next block on the same level.
-        if (!fitsInLine(memoryAddress.getOffset(cache), size, cache.lineSize)) {
+        if (!fitsInLine) {
             // Mark this as an overrun and subtract a hit to avoid counting the overrun as a hit on the same level.
             cache.blockOverruns++;
             if (cacheIndex > 0) {
