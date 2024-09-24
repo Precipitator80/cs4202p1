@@ -1,4 +1,13 @@
 # CS4202-Practical-1 - Cache Simulator
+
+The task was to develop a memory cache simulator that simulates various memory caching
+hierarchies and strategies, ultimately reporting back statistics about the runtime behaviour of
+those caches. One run of the simulator accepts a JSON configuration file that describes
+a cache hierarchy, reads in a pre-generated dynamic memory trace file and uses those entries to
+access the simulated caches.
+
+This project does not include a report.
+
 To compile, run the following in the src folder:
 ```bash
 make all
